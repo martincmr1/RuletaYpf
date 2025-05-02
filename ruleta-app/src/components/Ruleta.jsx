@@ -3,6 +3,9 @@ import { Winwheel } from 'winwheel';
 
 function Ruleta({ onPremio }) {
   useEffect(() => {
+    const canvas = document.getElementById('ruletaCanvas');
+    if (!canvas) return;
+
     const ruleta = new Winwheel({
       canvasId: 'ruletaCanvas',
       numSegments: 6,
