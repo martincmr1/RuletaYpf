@@ -15,6 +15,7 @@
     "gsap": "^3.13.0",
     "html5-qrcode": "^2.3.8",
     "react": "^19.0.0",
+    "react-custom-roulette": "^1.4.1",
     "react-dom": "^19.0.0",
     "winwheel": "^1.0.1"
   },
