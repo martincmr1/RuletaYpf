@@ -1,11 +1,10 @@
 import { useEffect } from 'react';
 import { Winwheel } from 'winwheel';
+import { TweenMax } from 'gsap';
+window.TweenMax = TweenMax; // Necesario para Winwheel
 
 function Ruleta({ onPremio }) {
   useEffect(() => {
-    const canvas = document.getElementById('ruletaCanvas');
-    if (!canvas) return;
-
     const ruleta = new Winwheel({
       canvasId: 'ruletaCanvas',
       numSegments: 6,
