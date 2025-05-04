@@ -12,17 +12,23 @@ function QRScanner({ setTicket }) {
       (decodedText) => {
         try {
           console.log('QR leído:', decodedText);
-          const parts = decodedText.split('p=');
-          if (parts.length < 2) throw new Error("No se encontró 'p='");
 
-          const json = JSON.parse(atob(parts[1]));
-          if (!json.nroCmp) throw new Error("No se encontró nroCmp");
+          // Verificamos si es una URL AFIP con parámetro p=
+          const match = decodedText.match(/p=([A-Za-z0-9\-_]+)/);
+          if (!match || !match[1]) throw new Error("No se encontró el parámetro 'p='");
 
-          setTicket(json.nroCmp.toString());
-          scanner.clear(); // ✔️ Detener al encontrar
-        } catch (e) {
-          alert('❌ QR inválido o no es de un ticket fiscal');
-          console.error(e);
+          const jsonString = atob(match[1]);
+          const data = JSON.parse(jsonString);
+
+          const nroCmp = data.nroCmp || data.nroComprobante || data.nro; // intentos alternativos
+
+          if (!nroCmp) throw new Error('No se encontró nroCmp en el JSON');
+
+          setTicket(nroCmp.toString());
+          scanner.clear(); // ✔️ Detener escaneo
+        } catch (error) {
+          alert('❌ No se pudo leer un ticket fiscal válido.');
+          console.error(error);
         }
       },
       (error) => {
