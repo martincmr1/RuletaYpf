@@ -1,51 +1,53 @@
- // src/components/BarcodeScanner.jsx
-// src/components/BarcodeScanner.jsx
 import { useEffect } from 'react';
-import { BrowserMultiFormatReader } from '@zxing/library';
+import { Html5QrcodeScanner } from 'html5-qrcode';
 
 function BarcodeScanner({ setTicket }) {
   useEffect(() => {
-    const codeReader = new BrowserMultiFormatReader();
-    const videoElementId = 'barcode-reader';
-
-    codeReader.decodeFromVideoDevice({ facingMode: 'environment' }, videoElementId, (result, err) => {
-      if (result) {
-        console.log('Código leído:', result.getText());
-        setTicket(result.getText());
-        codeReader.reset();
-      }
+    const scanner = new Html5QrcodeScanner('reader', {
+      fps: 10,
+      qrbox: 250,
     });
 
+    scanner.render(
+      (decodedText) => {
+        try {
+          const partes = decodedText.split('/');
+          const base64 = partes[partes.length - 1];
+          const textoPlano = atob(base64); // → "OPESSA_03002_03_6_460470"
+
+          const secciones = textoPlano.split('_');
+          if (secciones.length >= 5) {
+            // Extraemos partes específicas
+            const puntoVenta = secciones[1].substring(1); // "03002" → "3002"
+            const tipoComprobante = secciones[2]; // "03"
+            const numeroComprobante = secciones[4]; // "460470"
+
+            const nroTicket = `${puntoVenta}-${tipoComprobante}-${numeroComprobante}`;
+            console.log('Ticket procesado:', nroTicket);
+            setTicket(nroTicket);
+            scanner.clear();
+          } else {
+            throw new Error('Formato desconocido');
+          }
+        } catch (e) {
+          alert('QR inválido o no corresponde a un ticket fiscal.');
+          console.error(e);
+        }
+      },
+      (error) => {
+        console.warn('Error escaneando:', error);
+      }
+    );
+
     return () => {
-      codeReader.reset();
+      scanner.clear().catch(() => {});
     };
   }, [setTicket]);
 
   return (
-    <div className="mb-4 text-center position-relative" style={{ maxWidth: '320px', margin: '0 auto' }}>
-      <p className="text-white">📷 Escaneá el código de barras del ticket</p>
-
-      {/* Video de la cámara */}
-      <video
-        id="barcode-reader"
-        style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
-        muted
-        playsInline
-      />
-
-      {/* Marco guía (overlay rectangular) */}
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        width: '80%',
-        height: '30%',
-        transform: 'translate(-50%, -50%)',
-        border: '2px solid lime',
-        borderRadius: '8px',
-        boxShadow: '0 0 10px rgba(0,255,0,0.6)',
-        pointerEvents: 'none'
-      }}></div>
+    <div className="mb-4 text-center">
+      <p className="text-white">📷 Escaneá el QR del ticket fiscal</p>
+      <div id="reader" style={{ width: '100%', maxWidth: '320px', margin: '0 auto' }}></div>
     </div>
   );
 }
