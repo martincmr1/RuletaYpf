@@ -8,23 +8,44 @@ function BarcodeScanner({ setTicket }) {
     const codeReader = new BrowserMultiFormatReader();
     const videoElementId = 'barcode-reader';
 
-    codeReader.decodeFromVideoDevice(null, videoElementId, (result, err) => {
+    codeReader.decodeFromVideoDevice({ facingMode: 'environment' }, videoElementId, (result, err) => {
       if (result) {
         console.log('Código leído:', result.getText());
         setTicket(result.getText());
-        codeReader.reset(); // Detiene la cámara
+        codeReader.reset();
       }
     });
 
     return () => {
-      codeReader.reset(); // Limpieza al desmontar
+      codeReader.reset();
     };
   }, [setTicket]);
 
   return (
-    <div className="mb-4 text-center">
+    <div className="mb-4 text-center position-relative" style={{ maxWidth: '320px', margin: '0 auto' }}>
       <p className="text-white">📷 Escaneá el código de barras del ticket</p>
-      <video id="barcode-reader" style={{ width: '100%', maxWidth: '320px', margin: '0 auto' }} />
+
+      {/* Video de la cámara */}
+      <video
+        id="barcode-reader"
+        style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
+        muted
+        playsInline
+      />
+
+      {/* Marco guía (overlay rectangular) */}
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        width: '80%',
+        height: '30%',
+        transform: 'translate(-50%, -50%)',
+        border: '2px solid lime',
+        borderRadius: '8px',
+        boxShadow: '0 0 10px rgba(0,255,0,0.6)',
+        pointerEvents: 'none'
+      }}></div>
     </div>
   );
 }
