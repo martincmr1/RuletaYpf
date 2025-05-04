@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import QRScanner from './components/QRScanner';
+import BarcodeScanner from './components/BarcodeScanner';
 import Formulario from './components/Formulario';
 import Ruleta from './components/Ruleta';
 import MensajeGanador from './components/MensajeGanador';
@@ -38,8 +38,10 @@ function App() {
       />
       <h3 className="mb-4">🎟️ Promo Ruleta YPF</h3>
 
-      {!ticket && <QRScanner setTicket={setTicket} />}
+      {/* Escáner de código de barras si aún no hay ticket */}
+      {!ticket && <BarcodeScanner setTicket={setTicket} />}
 
+      {/* Mostrar formulario después de escanear */}
       {ticket && !mostrarRuleta && (
         <Formulario
           ticket={ticket}
@@ -49,8 +51,10 @@ function App() {
         />
       )}
 
+      {/* Mostrar ruleta si DNI fue completado */}
       {mostrarRuleta && !premio && <Ruleta onPremio={handlePremio} />}
 
+      {/* Mostrar mensaje ganador */}
       {premio && (
         <MensajeGanador premio={premio} dni={dni} ticket={ticket} />
       )}

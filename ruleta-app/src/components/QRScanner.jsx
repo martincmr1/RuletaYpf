@@ -1,52 +1,49 @@
+ // src/components/BarcodeScanner.jsx
+import { BrowserMultiFormatReader } from '@zxing/browser';
 import { useEffect } from 'react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
 
-function QRScanner({ setTicket }) {
+function BarcodeScanner({ setTicket }) {
   useEffect(() => {
-    const scanner = new Html5QrcodeScanner('reader', {
-      fps: 10,
-      qrbox: 250,
-    });
+    const codeReader = new BrowserMultiFormatReader();
 
-    scanner.render(
-      (decodedText) => {
-        try {
-          console.log('QR leído:', decodedText);
+    codeReader
+      .listVideoInputDevices()
+      .then((videoInputDevices) => {
+        const selectedDeviceId = videoInputDevices[0]?.deviceId;
 
-          // Verificamos si es una URL AFIP con parámetro p=
-          const match = decodedText.match(/p=([A-Za-z0-9\-_]+)/);
-          if (!match || !match[1]) throw new Error("No se encontró el parámetro 'p='");
-
-          const jsonString = atob(match[1]);
-          const data = JSON.parse(jsonString);
-
-          const nroCmp = data.nroCmp || data.nroComprobante || data.nro; // intentos alternativos
-
-          if (!nroCmp) throw new Error('No se encontró nroCmp en el JSON');
-
-          setTicket(nroCmp.toString());
-          scanner.clear(); // ✔️ Detener escaneo
-        } catch (error) {
-          alert('❌ No se pudo leer un ticket fiscal válido.');
-          console.error(error);
+        if (!selectedDeviceId) {
+          alert('❌ No se detectó una cámara disponible');
+          return;
         }
-      },
-      (error) => {
-        console.warn('Error escaneando:', error);
-      }
-    );
+
+        codeReader.decodeFromVideoDevice(selectedDeviceId, 'barcode-reader', (result, err) => {
+          if (result) {
+            const barcodeValue = result.getText();
+            console.log('📦 Código de barras leído:', barcodeValue);
+            setTicket(barcodeValue); // Envía el valor leído
+            codeReader.reset(); // Detener escaneo tras lectura
+          }
+
+          if (err && !(err.name === 'NotFoundException')) {
+            console.error('❌ Error escaneando:', err);
+          }
+        });
+      })
+      .catch((err) => {
+        console.error('❌ Error al listar dispositivos de video:', err);
+      });
 
     return () => {
-      scanner.clear().catch(() => {});
+      codeReader.reset();
     };
   }, [setTicket]);
 
   return (
     <div className="mb-4 text-center">
-      <p className="text-white">📷 Escaneá el QR de tu ticket fiscal</p>
-      <div id="reader" style={{ width: '100%', maxWidth: '320px', margin: '0 auto' }}></div>
+      <p className="text-white">📷 Escaneá el código de barras de tu ticket</p>
+      <video id="barcode-reader" style={{ width: '100%', maxWidth: '320px', margin: '0 auto' }} />
     </div>
   );
 }
 
-export default QRScanner;
+export default BarcodeScanner;
