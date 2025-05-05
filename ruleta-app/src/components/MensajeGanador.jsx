@@ -4,23 +4,20 @@ function MensajeGanador({ premio, dni, ticket }) {
   const id = `${dni}-${ticket}-${Date.now()}`;
   const enviadoRef = useRef(false);
 
-  // Extraer apies y pv desde ticket tipo "3002-03-460470"
+  // Extraer APIES y PV desde el ticket (ej: "3002-03-460470")
   let apies = '';
   let pv = '';
   const partes = ticket.split('-');
-  if (partes.length >= 3) {
-    apies = partes[0]; // Ej: 3002
-    pv = partes[1];    // Ej: 03
+  if (partes.length === 3) {
+    apies = partes[0]; // 3002
+    pv = partes[1];    // 03
   }
 
   useEffect(() => {
     if (enviadoRef.current) return;
     enviadoRef.current = true;
 
-    // Mostrar valores enviados
-    alert(`Enviando a Google Sheets:\n\nID: ${id}\nDNI: ${dni}\nTicket: ${ticket}\nPremio: ${premio}\nAPIES: ${apies}\nPV: ${pv}`);
-
-    fetch('https://script.google.com/macros/s/AKfycbyWC9Tklo0ALdFnAooNs3XhO7mnscWZ3Pj0TPP_GkNd0zQGCSLeudL4Xju-6Nc-1l960g/exec', {
+    fetch('https://script.google.com/macros/s/AKfycbwa6i9Mwz9jhk2reAhrOzIFhl6akgw8WpA2yMCAdmoe1XTKhB_HlCbPpOkJ3tc2olzKMw/exec', {
       method: 'POST',
       body: new URLSearchParams({
         id,
@@ -30,25 +27,60 @@ function MensajeGanador({ premio, dni, ticket }) {
         apies,
         pv,
       }),
-    })
-    .then(res => res.text())
-    .then(text => {
-      console.log('Respuesta del script:', text);
-    })
-    .catch(err => {
-      console.error('Error al enviar al script:', err);
     });
   }, [id, dni, ticket, premio, apies, pv]);
 
+  const esGanador = premio !== 'No Ganó';
+
   return (
-    <div className="alert alert-success mt-4">
-      <h4 className="alert-heading">🎉 ¡Felicitaciones!</h4>
-      <p>Ganaste: <strong>{premio}</strong></p>
-      <hr />
-      <p className="mb-0">
-        <small>ID de validación:</small><br />
-        <code>{id}</code>
+    <div
+      className="alert mt-4"
+      style={{
+        backgroundColor: esGanador ? '#28a745' : '#ffc107',
+        color: 'white',
+        borderRadius: '12px',
+        fontWeight: 'bold',
+      }}
+    >
+      <h4 className="alert-heading" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <span style={{ filter: 'drop-shadow(1px 1px 2px black)', fontSize: '1.5rem', marginRight: '0.5rem' }}>
+          {esGanador ? '🎉' : '❌'}
+        </span>
+        {esGanador ? '¡Felicitaciones!' : '¡Seguí participando!'}
+      </h4>
+      <p>
+        {esGanador ? (
+          <>Ganaste: <strong>{premio}</strong></>
+        ) : (
+          'Seguí cargando para más chances'
+        )}
       </p>
+      <hr />
+      <p className="mb-0" style={{ fontWeight: 'normal' }}>
+        <small>ID de validación:</small><br />
+        <code style={{ color: esGanador ? '#000000' : '#000000', background: '#ffffff', padding: '4px 8px', borderRadius: '6px' }}>
+          {id}
+        </code>
+      </p>
+
+      {/* Botón Cerrar */}
+      <div className="mt-3 text-center">
+        <button
+          className="btn btn-light"
+          onClick={() => window.location.reload()}
+          style={{
+            backgroundColor: '#ffffff',
+            border: 'none',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            color: '#333',
+            fontWeight: 'bold',
+            marginTop: '12px'
+          }}
+        >
+          Cerrar
+        </button>
+      </div>
     </div>
   );
 }

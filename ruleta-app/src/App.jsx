@@ -26,17 +26,18 @@ function App() {
       style={{
         color: 'white',
         minHeight: '100vh',
-        background: 'linear-gradient(-45deg, #005baa, #007dc5, #005baa, #006fbf)',
-        backgroundSize: '400% 400%',
-        animation: 'ondaAzul 12s ease infinite',
+        backgroundColor: '#003b75', // color de base azul oscuro
+        backgroundImage: 'url("/background.png")',
+        backgroundRepeat: 'repeat',
+        backgroundSize: 'auto',
       }}
     >
       <img
-        src="/logo-ypf.png"
+        src="/Designer.png"
         alt="Logo YPF"
         style={{ width: '120px', marginBottom: '1rem' }}
       />
-      <h3 className="mb-4">🎟️ Promo Ruleta YPF</h3>
+      <h3 className="mb-4">Cargá, jugá y ganá!!!</h3>
 
       {/* Escáner de código de barras si aún no hay ticket */}
       {!ticket && <BarcodeScanner setTicket={setTicket} />}

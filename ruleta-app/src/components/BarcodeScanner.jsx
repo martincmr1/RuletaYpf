@@ -17,7 +17,6 @@ function BarcodeScanner({ setTicket }) {
 
           const secciones = textoPlano.split('_');
           if (secciones.length >= 5) {
-            // Extraemos partes específicas
             const puntoVenta = secciones[1].substring(1); // "03002" → "3002"
             const tipoComprobante = secciones[2]; // "03"
             const numeroComprobante = secciones[4]; // "460470"
@@ -38,6 +37,12 @@ function BarcodeScanner({ setTicket }) {
         console.warn('Error escaneando:', error);
       }
     );
+
+    // Oculta el mensaje de "Stopped scanning"
+    setTimeout(() => {
+      const spans = document.querySelectorAll('#reader__dashboard_section_csr span');
+      spans.forEach(span => span.remove());
+    }, 800);
 
     return () => {
       scanner.clear().catch(() => {});
