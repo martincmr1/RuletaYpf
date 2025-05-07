@@ -3,15 +3,18 @@ import { useState } from 'react';
 function Formulario({ ticket, dni, setDni, onDatosCompletos }) {
   const [mensajeError, setMensajeError] = useState('');
   const [mostrarBotonCerrar, setMostrarBotonCerrar] = useState(false);
+  const [cargando, setCargando] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMensajeError('');
     setMostrarBotonCerrar(false);
+    setCargando(true);
 
     if (dni.length < 7) {
       setMensajeError('Ingrese un DNI válido');
       setMostrarBotonCerrar(true);
+      setCargando(false);
       return;
     }
 
@@ -25,12 +28,14 @@ function Formulario({ ticket, dni, setDni, onDatosCompletos }) {
       if (text.trim() === 'DUPLICADO') {
         setMensajeError('❌ El ticket ya fue usado. Por favor escanee uno nuevo.');
         setMostrarBotonCerrar(true);
+        setCargando(false);
         return;
       }
 
       if (text.trim() !== 'OK') {
         setMensajeError(`⚠️ Error del servidor: ${text}`);
         setMostrarBotonCerrar(true);
+        setCargando(false);
         return;
       }
 
@@ -39,6 +44,8 @@ function Formulario({ ticket, dni, setDni, onDatosCompletos }) {
       console.error(error);
       setMensajeError('⚠️ Error de red al verificar el ticket. Intente de nuevo.');
       setMostrarBotonCerrar(true);
+    } finally {
+      setCargando(false);
     }
   };
 
@@ -82,8 +89,21 @@ function Formulario({ ticket, dni, setDni, onDatosCompletos }) {
       )}
 
       {!mostrarBotonCerrar && (
-        <button type="submit" className="btn btn-success w-100">
-          <span className="me-2">🎲</span>Jugar
+        <button
+          type="submit"
+          className="btn btn-success w-100 d-flex justify-content-center align-items-center"
+          disabled={cargando}
+        >
+          {cargando ? (
+            <>
+              <div className="spinner-border spinner-border-sm me-2" role="status" />
+              Verificando...
+            </>
+          ) : (
+            <>
+              <span className="me-2">🎲</span>Jugar
+            </>
+          )}
         </button>
       )}
     </form>
