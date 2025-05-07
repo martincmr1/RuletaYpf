@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BarcodeScanner from './components/BarcodeScanner';
 import Formulario from './components/Formulario';
 import Ruleta from './components/Ruleta';
@@ -11,6 +11,11 @@ function App() {
   const [dni, setDni] = useState('');
   const [mostrarRuleta, setMostrarRuleta] = useState(false);
   const [premio, setPremio] = useState('');
+  const [esMovil, setEsMovil] = useState(false);
+
+  useEffect(() => {
+    setEsMovil(window.innerWidth < 576); // detectar si es móvil
+  }, []);
 
   const handleDatosCompletos = () => {
     setMostrarRuleta(true);
@@ -26,8 +31,8 @@ function App() {
       style={{
         color: 'white',
         minHeight: '100vh',
-        paddingTop: '19px', // medio centímetro de separación arriba
-        backgroundColor: '#003b75', // azul oscuro
+        paddingTop: !ticket && esMovil ? '19px' : '0px', // espaciado solo si escaneando en móvil
+        backgroundColor: '#003b75',
         backgroundImage: 'url("/background.png")',
         backgroundRepeat: 'repeat',
         backgroundSize: 'auto',
@@ -40,10 +45,8 @@ function App() {
       />
       <h3 className="mb-4">Cargá, jugá y ganá!!!</h3>
 
-      {/* Escáner de código de barras si aún no hay ticket */}
       {!ticket && <BarcodeScanner setTicket={setTicket} />}
 
-      {/* Mostrar formulario después de escanear */}
       {ticket && !mostrarRuleta && (
         <Formulario
           ticket={ticket}
@@ -53,10 +56,8 @@ function App() {
         />
       )}
 
-      {/* Mostrar ruleta si DNI fue completado */}
       {mostrarRuleta && !premio && <Ruleta onPremio={handlePremio} />}
 
-      {/* Mostrar mensaje ganador */}
       {premio && (
         <MensajeGanador premio={premio} dni={dni} ticket={ticket} />
       )}
