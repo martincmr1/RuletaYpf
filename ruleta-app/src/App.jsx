@@ -26,7 +26,8 @@ function App() {
       style={{
         color: 'white',
         minHeight: '100vh',
-        backgroundColor: '#003b75', // color de base azul oscuro
+        paddingTop: '19px', // medio centímetro de separación arriba
+        backgroundColor: '#003b75', // azul oscuro
         backgroundImage: 'url("/background.png")',
         backgroundRepeat: 'repeat',
         backgroundSize: 'auto',
