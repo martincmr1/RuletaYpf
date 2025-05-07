@@ -45,3 +45,19 @@ input::placeholder {
   background-color: rgba(0, 0, 0, 0.2);
   border: 1px solid #fff;
 }
+#reader__dashboard_section_csr button,
+#reader__dashboard_section_swaplink {
+  display: none !important;
+}
+
+/* Oculta el texto "Select Camera" y el selector */
+#reader__dashboard_section > div:nth-child(1),
+#reader__dashboard_section_csr select {
+  display: none !important;
+}
+#reader__dashboard_section_csr span[title="Info"] {
+  display: none !important;
+}
+#reader__scan_region + div {
+  display: none !important;
+}
