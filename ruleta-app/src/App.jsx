@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BarcodeScanner from './components/BarcodeScanner';
 import Formulario from './components/Formulario';
 import Ruleta from './components/Ruleta';
@@ -11,6 +11,15 @@ function App() {
   const [dni, setDni] = useState('');
   const [mostrarRuleta, setMostrarRuleta] = useState(false);
   const [premio, setPremio] = useState('');
+
+  // Forzar scroll hacia abajo cuando arranca
+  useEffect(() => {
+    if (!ticket) {
+      setTimeout(() => {
+        window.scrollTo({ top: 80, behavior: 'smooth' }); // desplazamiento de ~medio título
+      }, 300);
+    }
+  }, [ticket]);
 
   const handleDatosCompletos = () => {
     setMostrarRuleta(true);
@@ -26,7 +35,7 @@ function App() {
       style={{
         color: 'white',
         minHeight: '100vh',
-        backgroundColor: '#003b75', // color de base azul oscuro
+        backgroundColor: '#003b75',
         backgroundImage: 'url("/background.png")',
         backgroundRepeat: 'repeat',
         backgroundSize: 'auto',
@@ -39,10 +48,8 @@ function App() {
       />
       <h3 className="mb-4">Cargá, jugá y ganá!!!</h3>
 
-      {/* Escáner de código de barras si aún no hay ticket */}
       {!ticket && <BarcodeScanner setTicket={setTicket} />}
 
-      {/* Mostrar formulario después de escanear */}
       {ticket && !mostrarRuleta && (
         <Formulario
           ticket={ticket}
@@ -52,10 +59,8 @@ function App() {
         />
       )}
 
-      {/* Mostrar ruleta si DNI fue completado */}
       {mostrarRuleta && !premio && <Ruleta onPremio={handlePremio} />}
 
-      {/* Mostrar mensaje ganador */}
       {premio && (
         <MensajeGanador premio={premio} dni={dni} ticket={ticket} />
       )}
