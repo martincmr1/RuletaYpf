@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function Formulario({ ticket, dni, setDni, onDatosCompletos }) {
+function Formulario({ ticket, dni, setDni, apies, setApies, onDatosCompletos }) {
   const [mensajeError, setMensajeError] = useState('');
   const [mostrarBotonCerrar, setMostrarBotonCerrar] = useState(false);
   const [cargando, setCargando] = useState(false);
@@ -55,14 +55,8 @@ function Formulario({ ticket, dni, setDni, onDatosCompletos }) {
 
   return (
     <form onSubmit={handleSubmit} className="mt-4">
-      <div className="mb-3">
-        <label className="form-label">Número de Ticket</label>
-        <input
-          type="text"
-          className="form-control text-center fw-bold"
-          value={ticket}
-          readOnly
-        />
+      <div className="mb-3 text-success text-center fw-bold d-flex align-items-center justify-content-center">
+        ✅ Ticket capturado
       </div>
 
       <div className="mb-3">
@@ -72,6 +66,18 @@ function Formulario({ ticket, dni, setDni, onDatosCompletos }) {
           placeholder="Ingrese su DNI"
           value={dni}
           onChange={(e) => setDni(e.target.value)}
+          className="form-control"
+          required
+        />
+      </div>
+
+      <div className="mb-3">
+        <label className="form-label">Número de Estación (APIES)</label>
+        <input
+          type="number"
+          placeholder="Ej: 3002"
+          value={apies}
+          onChange={(e) => setApies(e.target.value.slice(0, 5))}
           className="form-control"
           required
         />

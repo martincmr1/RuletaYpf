@@ -1,16 +1,14 @@
 import { useEffect, useRef } from 'react';
 
-function MensajeGanador({ premio, dni, ticket }) {
-  const id = `${dni}-${ticket}-${Date.now()}`;
+function MensajeGanador({ premio, dni, ticket, apies }) {
+  const id = `${dni}-${Date.now()}`;
   const enviadoRef = useRef(false);
 
-  // Extraer APIES y PV desde el ticket (ej: "3002-03-460470")
-  let apies = '';
+  // Extraer PV desde el ticket (ej: "3002-03-460470")
   let pv = '';
   const partes = ticket.split('-');
   if (partes.length === 3) {
-    apies = partes[0]; // 3002
-    pv = partes[1];    // 03
+    pv = partes[1]; // 03
   }
 
   useEffect(() => {
@@ -42,12 +40,13 @@ function MensajeGanador({ premio, dni, ticket }) {
         fontWeight: 'bold',
       }}
     >
-      <h4 className="alert-heading" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <h4 className="alert-heading d-flex justify-content-center align-items-center">
         <span style={{ filter: 'drop-shadow(1px 1px 2px black)', fontSize: '1.5rem', marginRight: '0.5rem' }}>
           {esGanador ? '🎉' : '❌'}
         </span>
         {esGanador ? '¡Felicitaciones!' : '¡Seguí participando!'}
       </h4>
+
       <p>
         {esGanador ? (
           <>Ganaste: <strong>{premio}</strong></>
@@ -55,15 +54,15 @@ function MensajeGanador({ premio, dni, ticket }) {
           'Seguí cargando para más chances'
         )}
       </p>
+
       <hr />
       <p className="mb-0" style={{ fontWeight: 'normal' }}>
         <small>ID de validación:</small><br />
-        <code style={{ color: esGanador ? '#000000' : '#000000', background: '#ffffff', padding: '4px 8px', borderRadius: '6px' }}>
+        <code style={{ color: '#000000', background: '#ffffff', padding: '4px 8px', borderRadius: '6px' }}>
           {id}
         </code>
       </p>
 
-      {/* Botón Cerrar */}
       <div className="mt-3 text-center">
         <button
           className="btn btn-light"

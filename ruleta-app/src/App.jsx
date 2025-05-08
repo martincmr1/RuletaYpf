@@ -9,10 +9,11 @@ import './index.css';
 function App() {
   const [ticket, setTicket] = useState('');
   const [dni, setDni] = useState('');
+  const [apies, setApies] = useState(''); // <-- Nuevo estado
   const [mostrarRuleta, setMostrarRuleta] = useState(false);
   const [premio, setPremio] = useState('');
 
-  // Forzar scroll hacia el tope cuando se inicia y aún no hay ticket
+  // Scroll hacia el top cuando no hay ticket
   useEffect(() => {
     if (!ticket) {
       setTimeout(() => {
@@ -48,25 +49,28 @@ function App() {
       />
       <h3 className="mb-4">Cargá, jugá y ganá!!!</h3>
 
-      {/* Escáner de código de barras si aún no hay ticket */}
       {!ticket && <BarcodeScanner setTicket={setTicket} />}
 
-      {/* Mostrar formulario después de escanear */}
       {ticket && !mostrarRuleta && (
         <Formulario
           ticket={ticket}
           dni={dni}
           setDni={setDni}
+          apies={apies}               // <-- Enviamos apies
+          setApies={setApies}         // <-- También lo permitimos editar
           onDatosCompletos={handleDatosCompletos}
         />
       )}
 
-      {/* Mostrar ruleta si DNI fue completado */}
       {mostrarRuleta && !premio && <Ruleta onPremio={handlePremio} />}
 
-      {/* Mostrar mensaje ganador */}
       {premio && (
-        <MensajeGanador premio={premio} dni={dni} ticket={ticket} />
+        <MensajeGanador
+          premio={premio}
+          dni={dni}
+          ticket={ticket}
+          apies={apies}              // <-- Lo enviamos también acá
+        />
       )}
     </div>
   );

@@ -3,7 +3,6 @@ import { Html5QrcodeScanner, Html5Qrcode } from 'html5-qrcode';
 
 function BarcodeScanner({ setTicket }) {
   const [errorCamara, setErrorCamara] = useState('');
-  const [errorLectura, setErrorLectura] = useState('');
 
   useEffect(() => {
     Html5Qrcode.getCameras()
@@ -26,31 +25,14 @@ function BarcodeScanner({ setTicket }) {
 
         scanner.render(
           (decodedText) => {
-            // Limpiar mensaje de error previo si hubo
-            setErrorLectura('');
-
             try {
-              const partes = decodedText.split('/');
-              const base64 = partes[partes.length - 1];
-              const textoPlano = atob(base64); // Ej: "OPESSA_03002_03_6_460470"
-
-              const secciones = textoPlano.split('_');
-              if (secciones.length >= 5) {
-                const puntoVenta = secciones[1].substring(1);
-                const tipoComprobante = secciones[2];
-                const numeroComprobante = secciones[4];
-                const nroTicket = `${puntoVenta}-${tipoComprobante}-${numeroComprobante}`;
-                console.log('Ticket procesado:', nroTicket);
-                setTicket(nroTicket);
-                scanner.clear();
-              } else {
-                throw new Error('Formato desconocido');
-              }
+              // ✅ Guardar directamente la URL completa como ticket
+              console.log('URL capturada:', decodedText);
+              setTicket(decodedText);
+              scanner.clear();
             } catch (e) {
-              console.error('Error al decodificar:', e);
-              setTimeout(() => {
-                setErrorLectura('⚠️ QR inválido o no corresponde a un ticket fiscal.');
-              }, 5000); // Esperar 5 segundos antes de mostrar el error
+              alert('QR inválido o no corresponde a un ticket fiscal.');
+              console.error(e);
             }
           },
           (error) => {
@@ -67,19 +49,11 @@ function BarcodeScanner({ setTicket }) {
   return (
     <div className="mb-4 text-center">
       <p className="text-white">📷 Escaneá el QR del ticket fiscal</p>
-
-      {errorCamara && (
+      {errorCamara ? (
         <div className="alert alert-warning">{errorCamara}</div>
+      ) : (
+        <div id="reader" style={{ width: '100%', maxWidth: '320px', margin: '0 auto' }}></div>
       )}
-
-      {errorLectura && (
-        <div className="alert alert-danger mt-2">{errorLectura}</div>
-      )}
-
-      <div
-        id="reader"
-        style={{ width: '100%', maxWidth: '320px', margin: '0 auto' }}
-      ></div>
     </div>
   );
 }
