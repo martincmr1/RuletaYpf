@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+ import { useEffect, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 
 function BarcodeScanner({ setTicket }) {
@@ -19,6 +19,7 @@ function BarcodeScanner({ setTicket }) {
 
         const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
 
+        // Priorizar cámara trasera, o usar índice alternativo para Firefox
         let cameraId = devices.find((cam) => cam.label.toLowerCase().includes('back'))?.id;
         if (!cameraId) cameraId = isFirefox && devices[1] ? devices[1].id : devices[0].id;
 
@@ -31,24 +32,14 @@ function BarcodeScanner({ setTicket }) {
             fps: 10,
             qrbox: 250,
           },
-          async (decodedText) => {
-            console.log('✅ QR leído:', decodedText);
+          (decodedText) => {
             try {
-              // 🔐 Fuerza el cierre de TODAS las cámaras activas
-              const mediaDevices = await navigator.mediaDevices.enumerateDevices();
-              const videoDevices = mediaDevices.filter(device => device.kind === 'videoinput');
-
-              for (const device of videoDevices) {
-                const tempStream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: device.deviceId } });
-                tempStream.getTracks().forEach((track) => track.stop());
-              }
-
-              await html5Qr.stop();
-              await html5Qr.clear();
+              console.log('✅ QR leído:', decodedText);
               setTicket(decodedText);
+              html5Qr.stop().then(() => html5Qr.clear());
             } catch (err) {
-              console.error('❌ Error forzando el cierre de cámara:', err);
-             
+              console.error('❌ Error procesando el QR:', err);
+              alert('⚠️ QR inválido o no corresponde a un ticket fiscal.');
             }
           },
           (error) => {
