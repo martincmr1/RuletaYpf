@@ -5,7 +5,6 @@ function BarcodeScanner({ setTicket }) {
   const [errorCamara, setErrorCamara] = useState('');
   const [scanner, setScanner] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [scannerActivo, setScannerActivo] = useState(false); // ← nuevo estado para control
 
   useEffect(() => {
     const iniciarScanner = async () => {
@@ -19,6 +18,7 @@ function BarcodeScanner({ setTicket }) {
         }
 
         const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
+
         let cameraId = devices.find((cam) => cam.label.toLowerCase().includes('back'))?.id;
         if (!cameraId) cameraId = isFirefox && devices[1] ? devices[1].id : devices[0].id;
 
@@ -27,20 +27,28 @@ function BarcodeScanner({ setTicket }) {
 
         await html5Qr.start(
           cameraId,
-          { fps: 10, qrbox: 250 },
+          {
+            fps: 10,
+            qrbox: 250,
+          },
           async (decodedText) => {
-            if (!scannerActivo) return;
-            setScannerActivo(false); // detiene futuras lecturas
-
             console.log('✅ QR leído:', decodedText);
-            setTicket(decodedText);
-
             try {
+              // 🔐 Fuerza el cierre de TODAS las cámaras activas
+              const mediaDevices = await navigator.mediaDevices.enumerateDevices();
+              const videoDevices = mediaDevices.filter(device => device.kind === 'videoinput');
+
+              for (const device of videoDevices) {
+                const tempStream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: device.deviceId } });
+                tempStream.getTracks().forEach((track) => track.stop());
+              }
+
               await html5Qr.stop();
               await html5Qr.clear();
-              console.log('✅ Scanner detenido');
-            } catch (e) {
-              console.error('❌ Error al detener el scanner:', e);
+              setTicket(decodedText);
+            } catch (err) {
+              console.error('❌ Error forzando el cierre de cámara:', err);
+             
             }
           },
           (error) => {
@@ -48,7 +56,6 @@ function BarcodeScanner({ setTicket }) {
           }
         );
 
-        setScannerActivo(true);
         setLoading(false);
       } catch (err) {
         console.error('❌ Error accediendo a la cámara:', err);
