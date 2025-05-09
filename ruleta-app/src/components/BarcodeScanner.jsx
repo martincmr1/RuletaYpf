@@ -5,6 +5,7 @@ function BarcodeScanner({ setTicket }) {
   const [errorCamara, setErrorCamara] = useState('');
   const [scanner, setScanner] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [scannerActivo, setScannerActivo] = useState(false); // ← nuevo estado para control
 
   useEffect(() => {
     const iniciarScanner = async () => {
@@ -18,8 +19,6 @@ function BarcodeScanner({ setTicket }) {
         }
 
         const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
-
-        // Priorizar cámara trasera, o usar índice alternativo para Firefox
         let cameraId = devices.find((cam) => cam.label.toLowerCase().includes('back'))?.id;
         if (!cameraId) cameraId = isFirefox && devices[1] ? devices[1].id : devices[0].id;
 
@@ -28,18 +27,20 @@ function BarcodeScanner({ setTicket }) {
 
         await html5Qr.start(
           cameraId,
-          {
-            fps: 10,
-            qrbox: 250,
-          },
-          (decodedText) => {
+          { fps: 10, qrbox: 250 },
+          async (decodedText) => {
+            if (!scannerActivo) return;
+            setScannerActivo(false); // detiene futuras lecturas
+
+            console.log('✅ QR leído:', decodedText);
+            setTicket(decodedText);
+
             try {
-              console.log('✅ QR leído:', decodedText);
-              setTicket(decodedText);
-              html5Qr.stop().then(() => html5Qr.clear());
-            } catch (err) {
-              console.error('❌ Error procesando el QR:', err);
-              alert('⚠️ QR inválido o no corresponde a un ticket fiscal.');
+              await html5Qr.stop();
+              await html5Qr.clear();
+              console.log('✅ Scanner detenido');
+            } catch (e) {
+              console.error('❌ Error al detener el scanner:', e);
             }
           },
           (error) => {
@@ -47,6 +48,7 @@ function BarcodeScanner({ setTicket }) {
           }
         );
 
+        setScannerActivo(true);
         setLoading(false);
       } catch (err) {
         console.error('❌ Error accediendo a la cámara:', err);
