@@ -1,4 +1,4 @@
-import { useState } from 'react';
+ import { useState } from 'react';
 
 function Formulario({ ticket, dni, setDni, apies, setApies, onDatosCompletos }) {
   const [mensajeError, setMensajeError] = useState('');
@@ -11,6 +11,14 @@ function Formulario({ ticket, dni, setDni, apies, setApies, onDatosCompletos }) 
     setMostrarBotonCerrar(false);
     setCargando(true);
 
+    // Validar formato de ticket
+    if (!ticket.includes('mifactura.napse.global')) {
+      setMensajeError('❌ Ticket inválido. Por favor vuelva a escanear un ticket válido.');
+      setMostrarBotonCerrar(true);
+      setCargando(false);
+      return;
+    }
+
     if (dni.length < 7) {
       setMensajeError('Ingrese un DNI válido');
       setMostrarBotonCerrar(true);
@@ -19,9 +27,14 @@ function Formulario({ ticket, dni, setDni, apies, setApies, onDatosCompletos }) 
     }
 
     try {
-      const response = await fetch(
-        `https://script.google.com/macros/s/AKfycbwa6i9Mwz9jhk2reAhrOzIFhl6akgw8WpA2yMCAdmoe1XTKhB_HlCbPpOkJ3tc2olzKMw/exec?ticket=${ticket}`
-      );
+
+const response = await fetch(`${import.meta.env.VITE_SCRIPT_URL}?ticket=${ticket}`);
+
+
+
+
+
+      
 
       const text = await response.text();
 

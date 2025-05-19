@@ -5,17 +5,14 @@ function MensajeGanador({ premio, dni, ticket, apies }) {
   const enviadoRef = useRef(false);
 
   // Extraer PV desde el ticket (ej: "3002-03-460470")
-  let pv = '';
-  const partes = ticket.split('-');
-  if (partes.length === 3) {
-    pv = partes[1]; // 03
-  }
+  
 
   useEffect(() => {
     if (enviadoRef.current) return;
     enviadoRef.current = true;
 
-    fetch('https://script.google.com/macros/s/AKfycbwa6i9Mwz9jhk2reAhrOzIFhl6akgw8WpA2yMCAdmoe1XTKhB_HlCbPpOkJ3tc2olzKMw/exec', {
+    // Enviar datos al script de Google
+    fetch(import.meta.env.VITE_SCRIPT_URL, {
       method: 'POST',
       body: new URLSearchParams({
         id,
@@ -23,10 +20,10 @@ function MensajeGanador({ premio, dni, ticket, apies }) {
         ticket,
         premio,
         apies,
-        pv,
+        
       }),
     });
-  }, [id, dni, ticket, premio, apies, pv]);
+  }, [id, dni, ticket, premio, apies]);
 
   const esGanador = premio !== 'No Ganó';
 
@@ -41,7 +38,13 @@ function MensajeGanador({ premio, dni, ticket, apies }) {
       }}
     >
       <h4 className="alert-heading d-flex justify-content-center align-items-center">
-        <span style={{ filter: 'drop-shadow(1px 1px 2px black)', fontSize: '1.5rem', marginRight: '0.5rem' }}>
+        <span
+          style={{
+            filter: 'drop-shadow(1px 1px 2px black)',
+            fontSize: '1.5rem',
+            marginRight: '0.5rem',
+          }}
+        >
           {esGanador ? '🎉' : '❌'}
         </span>
         {esGanador ? '¡Felicitaciones!' : '¡Seguí participando!'}
@@ -49,7 +52,9 @@ function MensajeGanador({ premio, dni, ticket, apies }) {
 
       <p>
         {esGanador ? (
-          <>Ganaste: <strong>{premio}</strong></>
+          <>
+            Ganaste: <strong>{premio}</strong>
+          </>
         ) : (
           'Seguí cargando para más chances'
         )}
@@ -57,8 +62,16 @@ function MensajeGanador({ premio, dni, ticket, apies }) {
 
       <hr />
       <p className="mb-0" style={{ fontWeight: 'normal' }}>
-        <small>ID de validación:</small><br />
-        <code style={{ color: '#000000', background: '#ffffff', padding: '4px 8px', borderRadius: '6px' }}>
+        <small>ID de validación:</small>
+        <br />
+        <code
+          style={{
+            color: '#000000',
+            background: '#ffffff',
+            padding: '4px 8px',
+            borderRadius: '6px',
+          }}
+        >
           {id}
         </code>
       </p>
@@ -74,7 +87,7 @@ function MensajeGanador({ premio, dni, ticket, apies }) {
             borderRadius: '8px',
             color: '#333',
             fontWeight: 'bold',
-            marginTop: '12px'
+            marginTop: '12px',
           }}
         >
           Cerrar
