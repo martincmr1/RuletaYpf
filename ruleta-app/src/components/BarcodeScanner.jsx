@@ -1,4 +1,4 @@
- import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 
 function BarcodeScanner({ setTicket }) {
@@ -17,11 +17,14 @@ function BarcodeScanner({ setTicket }) {
           return;
         }
 
-        const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
+        // Buscar cámara trasera o usar la primera
+        let cameraId = devices.find((cam) =>
+          cam.label.toLowerCase().includes('back') || cam.label.toLowerCase().includes('trasera')
+        )?.id;
 
-        // Priorizar cámara trasera, o usar índice alternativo para Firefox
-        let cameraId = devices.find((cam) => cam.label.toLowerCase().includes('back'))?.id;
-        if (!cameraId) cameraId = isFirefox && devices[1] ? devices[1].id : devices[0].id;
+        if (!cameraId) {
+          cameraId = devices[0].id;
+        }
 
         const html5Qr = new Html5Qrcode("reader");
         setScanner(html5Qr);
@@ -31,6 +34,10 @@ function BarcodeScanner({ setTicket }) {
           {
             fps: 10,
             qrbox: 250,
+            aspectRatio: 1.0,
+            videoConstraints: {
+              facingMode: "environment"
+            }
           },
           (decodedText) => {
             try {
@@ -42,8 +49,8 @@ function BarcodeScanner({ setTicket }) {
               alert('⚠️ QR inválido o no corresponde a un ticket fiscal.');
             }
           },
-          (error) => {
-            console.warn('📷 Esperando lectura...');
+          () => {
+            console.warn('📷 Escaneando...');
           }
         );
 
