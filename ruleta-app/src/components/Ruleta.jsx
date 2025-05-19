@@ -4,11 +4,15 @@ import { Wheel } from 'react-custom-roulette';
 const data = [
   { option: 'Café con leche FULL', style: { backgroundColor: '#28a745' } },
   { option: 'No Ganó', style: { backgroundColor: '#dc3545' } },
-  { option: 'Escaneo Electrónico YPF BOXES', style: { backgroundColor: '#ffc107' } },
+  { option: 'Escaneo Electrónico', style: { backgroundColor: '#ffc107' } },
   { option: 'Alfajor FULL', style: { backgroundColor: '#17a2b8' } },
   { option: 'Barra cereal FULL', style: { backgroundColor: '#6f42c1' } },
   { option: 'No Ganó', style: { backgroundColor: '#dc3545' } },
 ];
+
+
+
+
 
 function Ruleta({ onPremio }) {
   const [mustSpin, setMustSpin] = useState(false);
