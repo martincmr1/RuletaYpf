@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { Wheel } from 'react-custom-roulette';
 
 const data = [
-  { option: '10% Descuento', style: { backgroundColor: '#28a745' } },
+  { option: 'Café con leche FULL', style: { backgroundColor: '#28a745' } },
   { option: 'No Ganó', style: { backgroundColor: '#dc3545' } },
-  { option: 'Gorra YPF', style: { backgroundColor: '#ffc107' } },
-  { option: 'Lubricante Gratis', style: { backgroundColor: '#17a2b8' } },
-  { option: '50% Servicio', style: { backgroundColor: '#6f42c1' } },
+  { option: 'Escaneo Electrónico YPF BOXES', style: { backgroundColor: '#ffc107' } },
+  { option: 'Alfajor FULL', style: { backgroundColor: '#17a2b8' } },
+  { option: 'Barra cereal FULL', style: { backgroundColor: '#6f42c1' } },
   { option: 'No Ganó', style: { backgroundColor: '#dc3545' } },
 ];
 
