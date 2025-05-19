@@ -24,7 +24,7 @@ function MensajeGanador({ premio, dni, ticket, apies }) {
 
   const rutasPremios = {
     'Café con leche FULL': 'cafe.jpg',
-    'Escaneo Electrónico YPF BOXES': 'escaneo.jpg',
+    'Escaneo Electrónico': 'escaneo.jpg',
     'Alfajor FULL': 'alfajor.jpg',
     'Barra cereal FULL': 'barra.jpg'
   };
