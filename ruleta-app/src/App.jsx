@@ -7,6 +7,7 @@ import MensajeGanador from './components/MensajeGanador';
 import ConsultarPremio from './components/ConsultarPremio';
 import Admin from './components/Admin';
 import Login from './components/Login';
+import EditorStockPremios from './components/EditorStockPremios';
 
 function PublicApp() {
   const [ticket, setTicket] = useState('');
@@ -105,6 +106,7 @@ function App() {
       <Routes>
         <Route path="/" element={<PublicApp />} />
         <Route path="/admin" element={auth ? <Admin /> : <Navigate to="/login" />} />
+        <Route path="/prizes" element={<EditorStockPremios/>} />
         <Route path="/login" element={<Login setAuth={setAuth} />} />
       </Routes>
     </Router>
