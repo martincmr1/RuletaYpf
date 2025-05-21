@@ -46,11 +46,6 @@ function ConsultarPremio() {
       const idIdx = headers.indexOf('id');
       const fechaIdx = headers.indexOf('fechadeentrega');
 
-      if (dniIdx === -1 || premioIdx === -1 || entregadoIdx === -1) {
-        setMensaje('⚠️ Error: encabezados incorrectos en la hoja.');
-        return;
-      }
-
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
         if (!row[dniIdx]) continue;
@@ -71,7 +66,7 @@ function ConsultarPremio() {
           setPremio(valorPremio);
           setApies(valorApies);
           setIdOperacion(valorId);
-          setFechaHora(valorFecha);
+          setFechaHora(valorFecha || new Date().toLocaleString('es-AR'));
           return;
         }
       }
@@ -132,53 +127,47 @@ function ConsultarPremio() {
     canvas.height = 400;
     const ctx = canvas.getContext('2d');
 
+    // Fondo blanco
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Marca de agua tipo mosaico
-    ctx.font = 'bold 32px Arial';
-    ctx.fillStyle = 'rgba(0, 59, 117, 0.07)';
-    for (let x = 0; x < canvas.width; x += 120) {
-      for (let y = 0; y < canvas.height; y += 80) {
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(-Math.PI / 6);
-        ctx.fillText('YPF', 0, 0);
-        ctx.restore();
+    // Marca de agua mosaico
+    const marcaAgua = new Image();
+    marcaAgua.src = '/mosaico-agua-ypf.png'; // Imagen de fondo con logo mosaico
+    marcaAgua.onload = () => {
+      for (let x = 0; x < canvas.width; x += 100) {
+        for (let y = 0; y < canvas.height; y += 100) {
+          ctx.globalAlpha = 0.1;
+          ctx.drawImage(marcaAgua, x, y, 100, 100);
+        }
       }
-    }
 
-    const logo = new Image();
-    logo.src = '/Designer.png';
-    logo.onload = () => {
-      ctx.drawImage(logo, 20, 20, 100, 40);
+      ctx.globalAlpha = 1;
 
-      ctx.fillStyle = '#003b75';
-      ctx.font = '20px Arial';
-      ctx.fillText('Comprobante de Canje', 150, 50);
+      // Logo YPF
+      const logo = new Image();
+      logo.src = '/logo-ypf.png';
+      logo.onload = () => {
+        ctx.drawImage(logo, 20, 20, 100, 40);
 
-      ctx.fillStyle = '#000000';
-      ctx.font = '16px Arial';
+        ctx.fillStyle = '#003b75';
+        ctx.font = '20px Arial';
+        ctx.fillText('Comprobante de Canje', 150, 50);
 
-      const now = new Date();
-      const fallbackFecha = `${now.getDate().toString().padStart(2, '0')}/${
-        (now.getMonth() + 1).toString().padStart(2, '0')
-      }/${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now
-        .getMinutes()
-        .toString()
-        .padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+        ctx.fillStyle = '#000000';
+        ctx.font = '16px Arial';
+        ctx.fillText(`DNI: ${dni}`, 40, 100);
+        ctx.fillText(`Premio: ${premio}`, 40, 130);
+        ctx.fillText(`Apies: ${apies}`, 40, 160);
+        ctx.fillText(`ID operación: ${idOperacion}`, 40, 190);
+        ctx.fillText(`Fecha de entrega: ${fechaHora}`, 40, 220);
+        ctx.fillText(`Vendedor: ${vendedorNombre}`, 40, 250);
 
-      ctx.fillText(`DNI: ${dni}`, 40, 100);
-      ctx.fillText(`Premio: ${premio}`, 40, 130);
-      ctx.fillText(`Apies: ${apies}`, 40, 160);
-      ctx.fillText(`Vendedor: ${vendedorNombre}`, 40, 190);
-      ctx.fillText(`ID operación: ${idOperacion || '(no disponible)'}`, 40, 220);
-      ctx.fillText(`Fecha de entrega: ${fechaHora || fallbackFecha}`, 40, 250);
-
-      const link = document.createElement('a');
-      link.download = `comprobante-${dni}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
+        const link = document.createElement('a');
+        link.download = `comprobante-${dni}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      };
     };
   };
 
@@ -232,13 +221,13 @@ function ConsultarPremio() {
       )}
 
       {canjeado && (
-        <div className="text-white text-center p-5 rounded" style={{ backgroundColor: '#28a745', fontSize: '1.5rem' }}>
+        <div className="text-white text-center p-5 rounded" style={{ backgroundColor: '#28a745', fontSize: '1rem' }}>
           <div style={{ fontSize: '3rem' }}>✅</div>
           Premio <strong>{premio}</strong> canjeado exitosamente<br />
           Apies <strong>{apies}</strong><br />
           DNI <strong>{dni}</strong><br />
           ID <strong>{idOperacion}</strong><br />
-          Fecha <strong>{fechaHora || '(hora local)'}</strong><br />
+          Fecha <strong>{fechaHora || new Date().toLocaleString('es-AR')}</strong><br />
           Vendedor <strong>{vendedorNombre}</strong><br />
           <button className="btn btn-light mt-3" onClick={descargarComprobante}>📥 Descargar comprobante</button>
         </div>

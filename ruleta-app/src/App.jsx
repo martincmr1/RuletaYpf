@@ -106,7 +106,7 @@ function App() {
       <Routes>
         <Route path="/" element={<PublicApp />} />
         <Route path="/admin" element={auth ? <Admin /> : <Navigate to="/login" />} />
-        <Route path="/prizes" element={<EditorStockPremios/>} />
+        <Route path="/prizes" element={auth ? <EditorStockPremios setAuth={setAuth} /> : <Navigate to="/login" />} />
         <Route path="/login" element={<Login setAuth={setAuth} />} />
       </Routes>
     </Router>
