@@ -17,7 +17,23 @@ function Formulario({ ticket, dni, setDni, apies, setApies, onDatosCompletos }) 
       }
 
       setCargando(true);
+
       try {
+        // Paso extra: obtener contenido HTML del ticket
+        const htmlRes = await fetch(ticket);
+        const html = await htmlRes.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        const contieneGNC = doc.body.textContent.toLowerCase().includes('gnc');
+
+        if (!contieneGNC) {
+          setMensajeError('❌ Lo sentimos, solo participan compras de GNC.');
+          setMostrarBotonCerrar(true);
+          return;
+        }
+
+        // Paso normal: verificación con backend
         const response = await fetch(`${import.meta.env.VITE_SCRIPT_URL}?ticket=${ticket}`);
         const text = await response.text();
 
@@ -36,7 +52,7 @@ function Formulario({ ticket, dni, setDni, apies, setApies, onDatosCompletos }) 
         setTicketVerificado(true);
       } catch (error) {
         console.error(error);
-        setMensajeError('⚠️ Error de red al verificar el ticket. Intente de nuevo.');
+        setMensajeError('⚠️ Error al verificar el ticket. Intente de nuevo.');
         setMostrarBotonCerrar(true);
       } finally {
         setCargando(false);

@@ -1,11 +1,15 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+ import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function Login({ setAuth }) {
   const [usuario, setUsuario] = useState('');
   const [clave, setClave] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Ruta a la que se redirigirá después del login, por defecto /admin
+  const from = location.state?.from?.pathname || '/admin';
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -15,7 +19,7 @@ function Login({ setAuth }) {
 
     if (inputHash === expectedHash) {
       setAuth(true);
-      navigate('/admin');
+      navigate(from, { replace: true }); // redirige a la ruta original
     } else {
       setError('Credenciales incorrectas');
     }

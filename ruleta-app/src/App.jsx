@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import BarcodeScanner from './components/BarcodeScanner';
 import Formulario from './components/Formulario';
@@ -101,12 +101,17 @@ function PublicApp() {
 function App() {
   const [auth, setAuth] = useState(false);
 
+  const RequireAuth = ({ element }) => {
+    const location = useLocation();
+    return auth ? element : <Navigate to="/login" state={{ from: location }} replace />;
+  };
+
   return (
     <Router>
       <Routes>
         <Route path="/" element={<PublicApp />} />
-        <Route path="/admin" element={auth ? <Admin /> : <Navigate to="/login" />} />
-        <Route path="/prizes" element={auth ? <EditorStockPremios setAuth={setAuth} /> : <Navigate to="/login" />} />
+        <Route path="/admin" element={<RequireAuth element={<Admin />} />} />
+        <Route path="/prizes" element={<RequireAuth element={<EditorStockPremios setAuth={setAuth} />} />} />
         <Route path="/login" element={<Login setAuth={setAuth} />} />
       </Routes>
     </Router>
